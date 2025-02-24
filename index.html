@@ -3,6 +3,12 @@
 <head>
 	<title>Vis & Society Assignment 2</title>
 	<link rel="stylesheet" href="https://vis-society.github.io/assignments/report.css" />
+	<style>
+		img {
+            max-width: 80%;
+            height: auto;
+        }
+	</style>
 </head>
 
 <body>
@@ -18,95 +24,96 @@
 	</header>
 	<main>
 		<section>
-			<h2>Subtheme: [ENTER SUBTHEME]</h2>
+			<h2>Subtheme: Speculation</h2>
 
 			<h3>Overall Analysis Questions</h3>
 			<ol>
-				<li>QUESTION_1</li>
-				<li>QUESTION_2</li>
-				<li>QUESTION_3</li>
-				<li>...</li>
+				<li><b>How has availability of housing at different prices changed over the years?</b>
+					</li>
+				<li><b>Flipping: who profits, how much, and where is it done?</b></li>
+				<li><b>How does corporate ownership in regions impact occupancy rates?</b></li>
 			</ol>
 		</section>
 
 		<section>
 			<h2>Discoveries & Insights</h2>
-
+			<h3>Initial explorations and sanity checks</h3>
+			<p>With the inclusion of the much-appreciated metadata files, the two main datasets I used (1. Residential sales data in the City of Boston, 2000-2023, 2. Corporate ownership rates and owner occupancy rates in Boston neighborhoods, 2004-2024) were well organized and easy to explore. Despite the organization and overall quality of the dataset, there were a number of interesting outliers and peculiar behaviors I investigated to understand the dataset better.</p>
+			<p>For a first pass, I investigated different dimensions and measures to identify sensible ranges and the existence of potential outliers. A number of values popped out as extremes for certain fields: for example, the "price diff pch", referring to the percentage change in price, had values well over 500,000%. You would imagine that having normalized to percentages would keep this in a reasonable range - when I investigated further, it turned out the base relative price was sometimes extraordinarily low or effectively missing (hence close to 0), and these percentages rivaled the dollar price itself. </p>
+			<p>To highlight a few of these kinds of explorations, I plotted sets of observations in <i>Figure 1</i>. In the first, I was investigating the trends of price over the years, and particularly if filtered on those indicated as flips. Once filtered, a previously somewhat subtle bump became drastically apparent, and I investigated further to determine the identity of the outlier. It turned out this was a large institutional transfer of 1 Beacon Street, and more specifically, had the use code for Housing Authority Property. I looked into the context a bit more, and found that this address corresponded to (in addition to many others, like the regional census bureau) the quasi-public agency MassHousing.</p>
 			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
+				<img src="1.png" alt="" />
 				<figcaption>
-				ENTER IMAGE CAPTION HERE.
+				<b>Top left:</b> an investigation of average price of transactions considered flips over year. This figure stood out because of a sharp outlier when filtering on flip index that was less present in the overall dataset. <b>Top right:</b> by adding a hierarchy to date and drilling down, I identified exactly 1 point as the culprit for this outlier. This $400 million+ transfer turned out to be 1 Beacon Street, the massive office building in Govern Center including many institutions like the regional Boston Census Bureau. 
+				<b>Bottom:</b> to understand the field flip ind, and whether or not it indicated a buy side flip transaction or a sell side flip, I plotted the full unique set and identified only exactly correlated indicators for sell side, meaning that flip ind exclusively marks sell side flips. However, this means that the right hand graph demonstrates that it's possible to have transactions that were marked as both buy and sell side flips.
+				</figcaption>
+			</figure>
+			<p>As I was trying to understand fields like flip ind, I found that by doing a dimension X dimension plot for these binary indicators would give you a uniqueness check in the case of missing combinations. This worked out to reveal that flip ind was essentially directly tied to the sell side of the flip, but doing another graph with buy side then meant that transactions could be both buy and sell side flips at the same time. I kept these explorations and additional context in mind as I progressed with the analysis.</p>
+			<h3><b>Question 1: How has availability of housing at different prices changed over the years?</b></h3>
+			<p>One of the immediate takeaways from MAPC report is the question of changing affordability, and the pressures introduced by investors of all scales. One of the citations from "American Community Survey, 5-Year Estimates" places affordability for a median-priced home at a minimum income of $200,000, which is well above median income levels. On top of that, the evolution of median prices over time (MAPC report, figures 8 and 9) has ballooned from under $400,000 to almost $700,000. </p>
+			<p>I wanted to understand how housing availability evolved over time, and with this background motivation, particularly in the price brackets roughly corresponding to what might lie around median housing. Due to these ranges, I padded the median range and chose bins of $200,000 from 0 to a million, and plotted in <i>Figure 2</i> the evolution over the recorded 20 years. </p>
+			<figure>
+				<img src="2.png" alt="" />
+				<figcaption>
+				By counting the total number of transactions for each price bracket, we obtain a rough proxy for the evolution of housing availability (and at the very least market fluctuation range) over the years. Stacking the plots in small multiples reveals a strong shift in trend line that clearly dives from negative to positive correlation as the price bracket increases. In addition, the Y-axis of total count remains constant and at the same factor, suggesting a direct comparison where we have far too many transactions dealt at prices well out of affordable ranges, and diving availability at ranges that would be more reasonable to median-income families and individuals.
+				</figcaption>
+			</figure>
+			<p>I chose to approximate availability with total transaction count in these ranges, and standardized the scale so that these multiples could be comparend in a give-and-take sense, where decreases directly represent a lack of transactions at reasonable prices. It was pretty illuminating to see the stark trendlines even at these scales, and how increases in availability only happen at exactly around the $700,000 cited median value today that can only be afforded by those with over $200,000 in income. Meanwhile, properties exceeding a million greatly outnumber the other brackets in terms of transactions.</p>
+			<p>I wanted to dive deeper into the nature of these transactions at each of these brackets, and in particular who might be doing them. <i>Figure 3</i> plots a scaled comparison of the percentage of transactions directly from investor to investor. This revealed unsurprising but nonetheless strong evidence for a market of direct investor-to-investor housing transactions as both price and relative availability (as we saw above) incrcease out of reach of the median income family. It is important to note however that the metric of count is not normalized against high-frequency transactions that might be favored by investments, but the proxy still seems somewhat useful as housing should at the very least represent trading at a much slower frequency than stock trading, for example.</p>
+			<figure>
+				<img src="3.png" alt="" />
+				<figcaption>
+				By analyzing the breakdown of investor-to-investor transactions at each price bracket, we identify a clear upwards trend for investor-only transactions as the absolute price of the properties increase. This paints a picture of the kind of market that drives the sheer availability and volume of housing opportunities, but only at high prices, which further substantiates current reports of a lopsided housing crisis.
 				</figcaption>
 			</figure>
 
+			<h3><b>Question 2: Flipping: who profits, how much, and where is it done?</b></h3>
+			<p>Both the MAPC report and articles like the "When Private Equity Becomes Your Landlord" strongly emphasize the impact of speculation, and in particular flipping, in their impact on the housing market. What is the nature of this flipping - who, how much, and where? <i>Figure 4</i> compares flipping profits in terms of percentage change over bins of increasing price: by using percentages, we can compare across the steadily increasing magnitude of the base price.</p>
 			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
+				<img src="4.png" alt="" />
 				<figcaption>
-				ENTER IMAGE CAPTION HERE.
+				A plot of profit only for flips, normalized by percentage as we increase steadily over each absolute price bin. In addition, we also stack standard transactions with investor-to-investor only transactions. Not only do we see large profits and steadily increasing over price despite being scaled by percentage, we also see a stark picture where the vast majority of flips are performed directly between investors.
 				</figcaption>
 			</figure>
-
+			<p>This chart revealed two trends: first, that despite scaling by percentage (and addressing outliers as previously discussed), profits continued to be made at large and growing margins as prices rose. Taking inspiration from the previous exploration in <i>Figure 3</i>, I also decided to stack by purchase type, which revealed a surprising dominance of flipping now being mostly done between entities considered investors by this dataset. I would have imagined more opportunistic purchases from individuals and normal residents, but the housing market seems to have gotten severe enough that not many individuals are selling to other investors, and those of investor-class trade amongst themselves.</p>
+			<p>With the who and the how much in mind, I wanted to explore the where: <i>Figure 5</i> graphs the locations of transactions, and coded by whether or not it constituted a flip.</p>
 			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
+				<img src="5.png" alt="" />
 				<figcaption>
-				ENTER IMAGE CAPTION HERE.
+				Locations of transactions overlayed with the number of flips, if at all, by size. There's a very clear localization of flipping activity closer to the heart of Boston, with very few flips performed in the outer suburbs or north of the Charles.
 				</figcaption>
 			</figure>
-
+			<p>This geographical representation was honestly surprising: it seemed either to represent missing information, or just an extreme preference for flipping is indicated in the data set for transactions that occur tightly around the heart of Boston. I checked multiple times to make sure I wasn't filtering on other variables, and in addition properties well outside these clustered areas were part of the dataset, so it seems as far as the dataset is concerned this tight localization of flipping activity seems to be apparent.</p>
+			<h3><b>Question 3: How does corporate ownership in regions impact occupancy rates?</b></h3>
+			We've both identified large amounts of corporate-level investor activity in the housing market (and amongst themselves), as well as flipping activity impacting regions of high contention and demand for housing. Despite this, all of the reports mentioned above identify a negative correlation between corporate presence and actual occupancy, an extremely unfortunate parallel to the large amounts of financial activity that might not serve large portions of the populace. How might we visualize the relationship between corporate ownership and actual owner occupancy? 
 			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
+				<img src="6.png" alt="" />
 				<figcaption>
-				ENTER IMAGE CAPTION HERE.
+				A rate-normalized representation of occupancy, the contextualized vacancy, overlayed with corporate ownership. The diameter of the red circle represents a full 100% in terms of occupancy, whereas the actual red area directly corresponds to vacancy. The blue maps to actual occupancy, while corporate ownership is overlayed on top of both to show the rate at which corporations own property. These values are drawn from a 20 year average, and demonstrate a strong trend where higher corporate ownership both drives down occupancy and starkly increases total vacancy of regions.
 				</figcaption>
 			</figure>
-
+			I decided to capture this using a unified scale of 0-1 proportion, or a rate of occupancy/ownership, where the remaining red area in <i>Figure 6</i> corresponds directly to vacancy. As we can see, there's a clear trend of increased vacancy as corporate ownership catches up to actual occupancy. This data is drawn from the 20 year average, which led me to think about how this might have changed over time.
 			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
+				<img src="7.png" alt="" />
 				<figcaption>
-				ENTER IMAGE CAPTION HERE.
+				Plotting the same graph from <i>Figure 6</i> but filtered on the start of the 20 year range and the end, we see a side-by-side comparison of the evolution of increasing corporate ownership, and decreasing occupancy. This occurs to the point that in the most contested areas, corporate ownership actually overtakes occupancy, suggesting very high vacancy rates in areas that require housing the most.
 				</figcaption>
 			</figure>
-
+			<p><i>Figure 7</i> captures the evolution from the start of the period to the end, and reveals that the phenomenon has progressed to the point of corporate ownership rates overtaking occupancy rates, despite these areas being localized in the most contentious regions of Boston.</p>
+			<p>I wanted to further explore this evolution, and in particular understand the rate at which this phenomenon progressed. <i>Figure 8</i> expands this view as a progressing series of curves represented over the 20 year period. In this scatter plot, we see that strong negative correlation of occupancy with corporate ownership.</p>
 			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
+				<img src="8.png" alt="" />
 				<figcaption>
-				ENTER IMAGE CAPTION HERE.
+				By plotting each region as a scatter between occupancy and corporate ownership, we visualize the negative correlation found above over time. In addition, the two-color scale centered between each decade reveals a much larger variance and rapid pace of acceleration in the last decade for this phenomenon, driving down occupancy as corporate ownership increases.
 				</figcaption>
 			</figure>
-
-			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
-				<figcaption>
-				ENTER IMAGE CAPTION HERE.
-				</figcaption>
-			</figure>
-
-			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
-				<figcaption>
-				ENTER IMAGE CAPTION HERE.
-				</figcaption>
-			</figure>
-
-			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
-				<figcaption>
-				ENTER IMAGE CAPTION HERE.
-				</figcaption>
-			</figure>
-
-			<figure>
-				<img src="IMAGE_FILENAME" alt="" />
-				<figcaption>
-				ENTER IMAGE CAPTION HERE.
-				</figcaption>
-			</figure>
+			<p>Even more importantly, we see the rate at which this phenomenon has progressed: towards the second decade, the curve and negative trend of corporate ownership dramatically progressed as occupancy rates fell. I decided to use a two-color color fade to starkly highlight the mid-point break, which enables direct visual area comparison of the range and variance over the two decades, representing the increased pace at which the phenomenon progressed.</p>
 		</section>
 
 		<section>
 			<h2>Summary</h2>
 
-			<p>WRITE FINAL SUMMARY HERE.</p>
+			<p>These explorations helped me take a glimpse at the scale, kind, and rate of change in the housing market, while simultaneously framing these developments in terms of the responsible participants. In the cramped local housing market, it seems that much of the activity (and availability) of housing exists only between those considered investors, who continue to profit at high margins as prices rise. This activity centralizes itself in areas of Boston most desparately in need of housing, while ironically it seems that this very corporate activity is negatively correlated with real occupancy. To top it off, this trend has not only steadily progressed over the last two decades, but seems to accelerate at rapid pace over the last decade, painting a stark picture for the future of affordable housing around Boston.</p>
 		</section>
 	</main>
 </body>
